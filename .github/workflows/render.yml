@@ -1,0 +1,32 @@
+YAML
+name: Render Video Otomatis
+
+on: [workflow_dispatch] # Menjalankan proses secara manual saat tombol diklik
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ambil kode dari repository
+        uses: actions/checkout@v4
+
+      - name: Siapkan Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install alat pengolah video (MoviePy & ImageMagick)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          sudo sed -i 's/rights="none" pattern="@\*"/rights="read|write" pattern="@*"/' /etc/ImageMagick-6/policy.xml
+          pip install moviepy==1.0.3
+
+      - name: Jalankan skrip pembuat video
+        run: python buat_video.py
+
+      - name: Simpan hasil video agar bisa diunduh
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-selesai
+          path: hasil_video.mp4
